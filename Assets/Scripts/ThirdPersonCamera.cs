@@ -6,7 +6,8 @@ public class ThirdPersonCamera : MonoBehaviour
     public Transform target;
 
     [Header("Camera Position")]
-    public float distance = 4f;
+    public float normalDistance = 4f;
+    public float aimDistance = 2.5f;
     public float height = 0.5f;
 
     [Header("Smoothing")]
@@ -17,9 +18,15 @@ public class ThirdPersonCamera : MonoBehaviour
         if (target == null)
             return;
 
+        bool isAiming = Input.GetMouseButton(1);
+
+        float currentDistance = isAiming
+            ? aimDistance
+            : normalDistance;
+
         Vector3 desiredPosition =
             target.position
-            - target.forward * distance
+            - target.forward * currentDistance
             + Vector3.up * height;
 
         transform.position = Vector3.Lerp(

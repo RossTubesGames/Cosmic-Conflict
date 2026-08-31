@@ -12,6 +12,7 @@ public class ThirdpersonPlayer : MonoBehaviour
     public float walkSpeed = 5f;
     public float sprintSpeed = 8f;
     public float rotationSpeed = 12f;
+    public float aimMovementMultiplier = 0.6f;
 
     [Header("Jumping")]
     public float jumpHeight = 1.5f;
@@ -23,6 +24,7 @@ public class ThirdpersonPlayer : MonoBehaviour
 
     [Header("Mouse")]
     public float mouseSensitivity = 2f;
+    public float aimSensitivityMultiplier = 0.7f;
     public float minCameraAngle = -40f;
     public float maxCameraAngle = 70f;
 
@@ -45,6 +47,7 @@ public class ThirdpersonPlayer : MonoBehaviour
     private void Update()
     {
         HandleCameraRotation();
+        HandlePlayerRotation();
         HandleMovement();
         HandleCursor();
     }
@@ -65,43 +68,39 @@ public class ThirdpersonPlayer : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        Vector3 inputDirection = new Vector3(horizontal, 0f, vertical).normalized;
+        Vector3 inputDirection =
+            new Vector3(horizontal, 0f, vertical).normalized;
 
-        Vector3 moveDirection = Vector3.zero;
+        Vector3 cameraForward = cameraTransform.forward;
+        Vector3 cameraRight = cameraTransform.right;
 
-        if (inputDirection.magnitude >= 0.1f)
-        {
-            Vector3 cameraForward = cameraTransform.forward;
-            Vector3 cameraRight = cameraTransform.right;
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
 
-            cameraForward.y = 0f;
-            cameraRight.y = 0f;
+        cameraForward.Normalize();
+        cameraRight.Normalize();
 
-            cameraForward.Normalize();
-            cameraRight.Normalize();
+        Vector3 moveDirection =
+            cameraForward * inputDirection.z +
+            cameraRight * inputDirection.x;
 
-            moveDirection =
-                cameraForward * inputDirection.z +
-                cameraRight * inputDirection.x;
+        moveDirection.Normalize();
 
-            moveDirection.Normalize();
-
-            Quaternion targetRotation =
-                Quaternion.LookRotation(moveDirection);
-
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
-            );
-        }
-
-        float currentSpeed = Input.GetKey(KeyCode.LeftShift)
+        float currentSpeed =
+            Input.GetKey(KeyCode.LeftShift)
             ? sprintSpeed
             : walkSpeed;
 
+        // Slow movement while aiming
+        if (Input.GetMouseButton(1))
+        {
+            currentSpeed *= aimMovementMultiplier;
+        }
+
         controller.Move(
-            moveDirection * currentSpeed * Time.deltaTime
+            moveDirection *
+            currentSpeed *
+            Time.deltaTime
         );
 
         if (Input.GetButtonDown("Jump") && grounded)
@@ -113,17 +112,45 @@ public class ThirdpersonPlayer : MonoBehaviour
         verticalVelocity += gravity * Time.deltaTime;
 
         controller.Move(
-            Vector3.up * verticalVelocity * Time.deltaTime
+            Vector3.up *
+            verticalVelocity *
+            Time.deltaTime
+        );
+    }
+
+    private void HandlePlayerRotation()
+    {
+        Vector3 forward = cameraTransform.forward;
+        forward.y = 0f;
+
+        if (forward.sqrMagnitude < 0.01f)
+            return;
+
+        Quaternion targetRotation =
+            Quaternion.LookRotation(forward);
+
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
         );
     }
 
     private void HandleCameraRotation()
     {
+        float currentSensitivity = mouseSensitivity;
+
+        // Slow camera movement while aiming
+        if (Input.GetMouseButton(1))
+        {
+            currentSensitivity *= aimSensitivityMultiplier;
+        }
+
         float mouseX =
-            Input.GetAxis("Mouse X") * mouseSensitivity;
+            Input.GetAxis("Mouse X") * currentSensitivity;
 
         float mouseY =
-            Input.GetAxis("Mouse Y") * mouseSensitivity;
+            Input.GetAxis("Mouse Y") * currentSensitivity;
 
         cameraYaw += mouseX;
         cameraPitch -= mouseY;
