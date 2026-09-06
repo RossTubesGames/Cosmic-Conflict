@@ -6,6 +6,7 @@ public class PlayerHealth : MonoBehaviour
     public float maxHealth = 100f;
 
     private float currentHealth;
+    private bool isDead = false;
 
     private void Start()
     {
@@ -14,6 +15,9 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        if (isDead)
+            return;
+
         currentHealth -= damage;
 
         Debug.Log("Player HP: " + currentHealth);
@@ -26,8 +30,21 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        if (isDead)
+            return;
+
+        isDead = true;
+
         Debug.Log("PLAYER DIED");
 
-        // Respawning comes next.
+        SpawnMenu spawnMenu =
+            FindFirstObjectByType<SpawnMenu>();
+
+        if (spawnMenu != null)
+        {
+            spawnMenu.ShowMenu();
+        }
+
+        Destroy(gameObject);
     }
 }

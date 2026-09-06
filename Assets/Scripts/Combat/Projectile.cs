@@ -29,7 +29,11 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Ignore whoever fired the projectile
+        Debug.Log(
+            "Projectile hit: " +
+            other.gameObject.name
+        );
+
         if (owner != null &&
             other.transform.root == owner.root)
         {
@@ -39,22 +43,16 @@ public class Projectile : MonoBehaviour
         TeamMember targetTeam =
             other.GetComponentInParent<TeamMember>();
 
-        // Hit a character
         if (targetTeam != null)
         {
-            // Friendly fire off
+            Debug.Log(
+                "Target team found: " +
+                targetTeam.team
+            );
+
             if (targetTeam.team == team)
             {
-                return;
-            }
-
-            EnemyHealth enemyHealth =
-                other.GetComponentInParent<EnemyHealth>();
-
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(damage);
-                Destroy(gameObject);
+                Debug.Log("Friendly fire ignored.");
                 return;
             }
 
@@ -63,13 +61,30 @@ public class Projectile : MonoBehaviour
 
             if (playerHealth != null)
             {
+                Debug.Log("PLAYER HIT!");
+
                 playerHealth.TakeDamage(damage);
+
                 Destroy(gameObject);
+
+                return;
+            }
+
+            EnemyHealth enemyHealth =
+                other.GetComponentInParent<EnemyHealth>();
+
+            if (enemyHealth != null)
+            {
+                Debug.Log("AI HIT!");
+
+                enemyHealth.TakeDamage(damage);
+
+                Destroy(gameObject);
+
                 return;
             }
         }
 
-        // Hit environment
         if (!other.isTrigger)
         {
             Destroy(gameObject);
