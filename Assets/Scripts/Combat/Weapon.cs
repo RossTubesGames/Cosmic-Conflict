@@ -14,6 +14,14 @@ public class Weapon : MonoBehaviour
 
     private float nextFireTime;
 
+    private TeamMember teamMember;
+
+    private void Start()
+    {
+        teamMember =
+            GetComponentInParent<TeamMember>();
+    }
+
     private void Update()
     {
         if (Input.GetMouseButton(0) &&
@@ -39,14 +47,23 @@ public class Weapon : MonoBehaviour
 
         if (projectile != null)
         {
-            projectile.team =
-                Projectile.ProjectileTeam.Player;
+            if (teamMember != null)
+            {
+                projectile.team =
+                    teamMember.team;
+            }
 
-            projectile.owner = transform.root;
+            projectile.owner =
+                transform.root;
 
-            projectile.speed = bulletSpeed;
-            projectile.damage = bulletDamage;
-            projectile.lifetime = bulletLifetime;
+            projectile.speed =
+                bulletSpeed;
+
+            projectile.damage =
+                bulletDamage;
+
+            projectile.lifetime =
+                bulletLifetime;
         }
     }
 }

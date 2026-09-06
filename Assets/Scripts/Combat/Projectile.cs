@@ -2,14 +2,8 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public enum ProjectileTeam
-    {
-        Player,
-        Enemy
-    }
-
     [Header("Projectile Stats")]
-    public ProjectileTeam team;
+    public Team team;
 
     public float speed = 40f;
     public float damage = 25f;
@@ -26,7 +20,8 @@ public class Projectile : MonoBehaviour
 
         if (rb != null)
         {
-            rb.linearVelocity = transform.forward * speed;
+            rb.linearVelocity =
+                transform.forward * speed;
         }
 
         Destroy(gameObject, lifetime);
@@ -34,15 +29,25 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Ignore whoever fired this bullet
-        if (owner != null && other.transform.root == owner.root)
+        // Ignore whoever fired the projectile
+        if (owner != null &&
+            other.transform.root == owner.root)
         {
             return;
         }
 
-        // Player bullet hits enemy
-        if (team == ProjectileTeam.Player)
+        TeamMember targetTeam =
+            other.GetComponentInParent<TeamMember>();
+
+        // Hit a character
+        if (targetTeam != null)
         {
+            // Friendly fire off
+            if (targetTeam.team == team)
+            {
+                return;
+            }
+
             EnemyHealth enemyHealth =
                 other.GetComponentInParent<EnemyHealth>();
 
@@ -52,11 +57,7 @@ public class Projectile : MonoBehaviour
                 Destroy(gameObject);
                 return;
             }
-        }
 
-        // Enemy bullet hits player
-        if (team == ProjectileTeam.Enemy)
-        {
             PlayerHealth playerHealth =
                 other.GetComponentInParent<PlayerHealth>();
 

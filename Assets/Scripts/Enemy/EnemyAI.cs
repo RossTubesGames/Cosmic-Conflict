@@ -4,7 +4,6 @@ using UnityEngine.AI;
 public class EnemyAI : MonoBehaviour
 {
     [Header("References")]
-    public Transform player;
     public NavMeshAgent agent;
     public Transform shootPoint;
     public GameObject bulletPrefab;
@@ -19,37 +18,46 @@ public class EnemyAI : MonoBehaviour
     public float bulletDamage = 20f;
     public float bulletLifetime = 10f;
 
+    [Header("Targeting")]
+    public float targetSearchInterval = 0.5f;
+
+    private TeamMember myTeam;
+    private Transform currentTarget;
     private float nextFireTime;
+    private float nextTargetSearchTime;
 
     private void Start()
     {
         if (agent == null)
             agent = GetComponent<NavMeshAgent>();
 
-        if (player == null)
-        {
-            GameObject playerObject =
-                GameObject.FindGameObjectWithTag("Player");
+        myTeam = GetComponent<TeamMember>();
 
-            if (playerObject != null)
-                player = playerObject.transform;
-        }
+        FindTarget();
     }
 
     private void Update()
     {
-        if (player == null)
+        if (myTeam == null)
             return;
 
-        float distance =
-            Vector3.Distance(
-                transform.position,
-                player.position
-            );
+        if (Time.time >= nextTargetSearchTime)
+        {
+            FindTarget();
+            nextTargetSearchTime = Time.time + targetSearchInterval;
+        }
+
+        if (currentTarget == null)
+            return;
+
+        float distance = Vector3.Distance(
+            transform.position,
+            currentTarget.position
+        );
 
         if (distance > shootRange)
         {
-            MoveToPlayer();
+            MoveToTarget();
         }
         else
         {
@@ -57,18 +65,58 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void MoveToPlayer()
+    private void FindTarget()
     {
+        TeamMember[] allTeamMembers =
+            FindObjectsByType<TeamMember>(
+                FindObjectsSortMode.None
+            );
+
+        float closestDistance = Mathf.Infinity;
+        Transform closestTarget = null;
+
+        foreach (TeamMember member in allTeamMembers)
+        {
+            if (member == myTeam)
+                continue;
+
+            if (member.team == myTeam.team)
+                continue;
+
+            float distance = Vector3.Distance(
+                transform.position,
+                member.transform.position
+            );
+
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestTarget = member.transform;
+            }
+        }
+
+        currentTarget = closestTarget;
+    }
+
+    private void MoveToTarget()
+    {
+        if (agent == null)
+            return;
+
         agent.isStopped = false;
-        agent.SetDestination(player.position);
+
+        agent.SetDestination(
+            currentTarget.position
+        );
     }
 
     private void StopAndShoot()
     {
-        agent.isStopped = true;
+        if (agent != null)
+            agent.isStopped = true;
 
         Vector3 direction =
-            player.position -
+            currentTarget.position -
             transform.position;
 
         direction.y = 0f;
@@ -108,11 +156,8 @@ public class EnemyAI : MonoBehaviour
 
         if (projectile != null)
         {
-            projectile.team =
-                Projectile.ProjectileTeam.Enemy;
-
+            projectile.team = myTeam.team;
             projectile.owner = transform.root;
-
             projectile.speed = bulletSpeed;
             projectile.damage = bulletDamage;
             projectile.lifetime = bulletLifetime;
