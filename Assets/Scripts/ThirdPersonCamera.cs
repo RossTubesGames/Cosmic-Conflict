@@ -15,12 +15,20 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void LateUpdate()
     {
+        // If we do not currently have a target,
+        // try to find the spawned Player.
+        if (target == null)
+        {
+            FindPlayerTarget();
+        }
+
         if (target == null)
             return;
 
         bool isAiming = Input.GetMouseButton(1);
 
-        float currentDistance = isAiming
+        float currentDistance =
+            isAiming
             ? aimDistance
             : normalDistance;
 
@@ -36,5 +44,33 @@ public class ThirdPersonCamera : MonoBehaviour
         );
 
         transform.LookAt(target.position);
+    }
+
+    private void FindPlayerTarget()
+    {
+        GameObject player =
+            GameObject.FindGameObjectWithTag("Player");
+
+        if (player == null)
+            return;
+
+        Transform camTarget =
+            player.transform.Find("CamTarget");
+
+        if (camTarget != null)
+        {
+            target = camTarget;
+        }
+        else
+        {
+            Debug.LogWarning(
+                "Player found, but no child called CamTarget exists."
+            );
+        }
+    }
+
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
     }
 }

@@ -29,23 +29,57 @@ public class ThirdpersonPlayer : MonoBehaviour
     public float maxCameraAngle = 70f;
 
     private float verticalVelocity;
-
     private float cameraYaw;
     private float cameraPitch;
 
     private void Start()
     {
         if (controller == null)
-            controller = GetComponent<CharacterController>();
+        {
+            controller =
+                GetComponent<CharacterController>();
+        }
 
-        Cursor.lockState = CursorLockMode.Locked;
+        // Automatically find the Main Camera.
+        if (cameraTransform == null)
+        {
+            if (Camera.main != null)
+            {
+                cameraTransform =
+                    Camera.main.transform;
+            }
+        }
+
+        // Automatically find CamTarget inside Player.
+        if (cameraTarget == null)
+        {
+            Transform foundTarget =
+                transform.Find("CamTarget");
+
+            if (foundTarget != null)
+            {
+                cameraTarget =
+                    foundTarget;
+            }
+        }
+
+        Cursor.lockState =
+            CursorLockMode.Locked;
+
         Cursor.visible = false;
 
-        cameraYaw = transform.eulerAngles.y;
+        cameraYaw =
+            transform.eulerAngles.y;
     }
 
     private void Update()
     {
+        if (cameraTransform == null ||
+            cameraTarget == null)
+        {
+            return;
+        }
+
         HandleCameraRotation();
         HandlePlayerRotation();
         HandleMovement();
@@ -60,19 +94,30 @@ public class ThirdpersonPlayer : MonoBehaviour
             groundLayer
         );
 
-        if (grounded && verticalVelocity < 0f)
+        if (grounded &&
+            verticalVelocity < 0f)
         {
             verticalVelocity = -2f;
         }
 
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        float horizontal =
+            Input.GetAxisRaw("Horizontal");
+
+        float vertical =
+            Input.GetAxisRaw("Vertical");
 
         Vector3 inputDirection =
-            new Vector3(horizontal, 0f, vertical).normalized;
+            new Vector3(
+                horizontal,
+                0f,
+                vertical
+            ).normalized;
 
-        Vector3 cameraForward = cameraTransform.forward;
-        Vector3 cameraRight = cameraTransform.right;
+        Vector3 cameraForward =
+            cameraTransform.forward;
+
+        Vector3 cameraRight =
+            cameraTransform.right;
 
         cameraForward.y = 0f;
         cameraRight.y = 0f;
@@ -81,8 +126,8 @@ public class ThirdpersonPlayer : MonoBehaviour
         cameraRight.Normalize();
 
         Vector3 moveDirection =
-            cameraForward * inputDirection.z +
-            cameraRight * inputDirection.x;
+            cameraForward * inputDirection.z
+            + cameraRight * inputDirection.x;
 
         moveDirection.Normalize();
 
@@ -91,36 +136,44 @@ public class ThirdpersonPlayer : MonoBehaviour
             ? sprintSpeed
             : walkSpeed;
 
-        // Slow movement while aiming
         if (Input.GetMouseButton(1))
         {
-            currentSpeed *= aimMovementMultiplier;
+            currentSpeed *=
+                aimMovementMultiplier;
         }
 
         controller.Move(
-            moveDirection *
-            currentSpeed *
-            Time.deltaTime
+            moveDirection
+            * currentSpeed
+            * Time.deltaTime
         );
 
-        if (Input.GetButtonDown("Jump") && grounded)
+        if (Input.GetButtonDown("Jump") &&
+            grounded)
         {
             verticalVelocity =
-                Mathf.Sqrt(jumpHeight * -2f * gravity);
+                Mathf.Sqrt(
+                    jumpHeight
+                    * -2f
+                    * gravity
+                );
         }
 
-        verticalVelocity += gravity * Time.deltaTime;
+        verticalVelocity +=
+            gravity * Time.deltaTime;
 
         controller.Move(
-            Vector3.up *
-            verticalVelocity *
-            Time.deltaTime
+            Vector3.up
+            * verticalVelocity
+            * Time.deltaTime
         );
     }
 
     private void HandlePlayerRotation()
     {
-        Vector3 forward = cameraTransform.forward;
+        Vector3 forward =
+            cameraTransform.forward;
+
         forward.y = 0f;
 
         if (forward.sqrMagnitude < 0.01f)
@@ -129,28 +182,33 @@ public class ThirdpersonPlayer : MonoBehaviour
         Quaternion targetRotation =
             Quaternion.LookRotation(forward);
 
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation,
-            targetRotation,
-            rotationSpeed * Time.deltaTime
-        );
+        transform.rotation =
+            Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                rotationSpeed
+                * Time.deltaTime
+            );
     }
 
     private void HandleCameraRotation()
     {
-        float currentSensitivity = mouseSensitivity;
+        float currentSensitivity =
+            mouseSensitivity;
 
-        // Slow camera movement while aiming
         if (Input.GetMouseButton(1))
         {
-            currentSensitivity *= aimSensitivityMultiplier;
+            currentSensitivity *=
+                aimSensitivityMultiplier;
         }
 
         float mouseX =
-            Input.GetAxis("Mouse X") * currentSensitivity;
+            Input.GetAxis("Mouse X")
+            * currentSensitivity;
 
         float mouseY =
-            Input.GetAxis("Mouse Y") * currentSensitivity;
+            Input.GetAxis("Mouse Y")
+            * currentSensitivity;
 
         cameraYaw += mouseX;
         cameraPitch -= mouseY;
@@ -173,13 +231,17 @@ public class ThirdpersonPlayer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Cursor.lockState = CursorLockMode.None;
+            Cursor.lockState =
+                CursorLockMode.None;
+
             Cursor.visible = true;
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.lockState =
+                CursorLockMode.Locked;
+
             Cursor.visible = false;
         }
     }
