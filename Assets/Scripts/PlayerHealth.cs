@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
@@ -37,14 +38,28 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log("PLAYER DIED");
 
+        ThirdpersonPlayer playerController =
+            GetComponent<ThirdpersonPlayer>();
+
+        if (playerController != null)
+        {
+            playerController.enabled = false;
+        }
+
+        CharacterController characterController =
+            GetComponent<CharacterController>();
+
+        if (characterController != null)
+        {
+            characterController.enabled = false;
+        }
+
         SpawnMenu spawnMenu =
             FindFirstObjectByType<SpawnMenu>();
 
         if (spawnMenu != null)
         {
-            spawnMenu.ShowMenu();
+            spawnMenu.StartDeathScreen(gameObject);
         }
-
-        Destroy(gameObject);
     }
 }

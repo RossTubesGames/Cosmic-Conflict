@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,17 +12,43 @@ public class SpawnMenu : MonoBehaviour
     public CommandPost westPost;
     public CommandPost eastPost;
 
-    [Header("UI")]
+    [Header("Spawn UI")]
     public GameObject spawnPanel;
 
     public Button westPostButton;
     public Button eastPostButton;
 
+    [Header("Death UI")]
+    public GameObject deathPanel;
+    public TMP_Text countdownText;
+
+    [Header("Death Settings")]
+    public float respawnDelay = 10f;
+
     private Team selectedTeam = Team.Human;
+
+    private GameObject deadPlayer;
+
+    private Coroutine respawnCoroutine;
 
     private void Start()
     {
         SelectHuman();
+
+        // No player exists at the beginning,
+        // so show the spawn menu immediately.
+        if (spawnPanel != null)
+            spawnPanel.SetActive(true);
+
+        if (deathPanel != null)
+            deathPanel.SetActive(false);
+
+        Cursor.lockState =
+            CursorLockMode.None;
+
+        Cursor.visible = true;
+
+        UpdatePostButtons();
     }
 
     public void SelectHuman()
@@ -62,7 +90,7 @@ public class SpawnMenu : MonoBehaviour
             westPost
         );
 
-        HideMenu();
+        HideSpawnMenu();
     }
 
     public void SpawnAtEast()
@@ -71,12 +99,104 @@ public class SpawnMenu : MonoBehaviour
             eastPost
         );
 
-        HideMenu();
+        HideSpawnMenu();
     }
 
-    public void ShowMenu()
+    public void StartDeathScreen(GameObject player)
     {
-        spawnPanel.SetActive(true);
+        deadPlayer = player;
+
+        if (spawnPanel != null)
+            spawnPanel.SetActive(false);
+
+        if (deathPanel != null)
+            deathPanel.SetActive(true);
+
+        Cursor.lockState =
+            CursorLockMode.None;
+
+        Cursor.visible = true;
+
+        if (respawnCoroutine != null)
+        {
+            StopCoroutine(respawnCoroutine);
+        }
+
+        respawnCoroutine =
+            StartCoroutine(RespawnCountdown());
+    }
+
+    private IEnumerator RespawnCountdown()
+    {
+        float timeRemaining =
+            respawnDelay;
+
+        while (timeRemaining > 0f)
+        {
+            if (countdownText != null)
+            {
+                countdownText.text =
+                    "Respawn in "
+                    + Mathf.CeilToInt(timeRemaining);
+            }
+
+            timeRemaining -=
+                Time.deltaTime;
+
+            yield return null;
+        }
+
+        OpenSpawnMenu();
+    }
+
+    public void RespawnButtonPressed()
+    {
+        OpenSpawnMenu();
+    }
+
+    public void ChangeCharacterButtonPressed()
+    {
+        if (respawnCoroutine != null)
+        {
+            StopCoroutine(respawnCoroutine);
+        }
+
+        if (deathPanel != null)
+        {
+            deathPanel.SetActive(false);
+        }
+
+        if (deadPlayer != null)
+        {
+            Destroy(deadPlayer);
+        }
+
+        Debug.Log(
+            "CHANGE CHARACTER MENU COMES NEXT"
+        );
+    }
+
+    private void OpenSpawnMenu()
+    {
+        if (respawnCoroutine != null)
+        {
+            StopCoroutine(respawnCoroutine);
+        }
+
+        if (deathPanel != null)
+        {
+            deathPanel.SetActive(false);
+        }
+
+        if (deadPlayer != null)
+        {
+            Destroy(deadPlayer);
+        }
+
+        if (spawnPanel != null)
+        {
+            spawnPanel.SetActive(true);
+        }
 
         Cursor.lockState =
             CursorLockMode.None;
@@ -86,9 +206,12 @@ public class SpawnMenu : MonoBehaviour
         UpdatePostButtons();
     }
 
-    public void HideMenu()
+    private void HideSpawnMenu()
     {
-        spawnPanel.SetActive(false);
+        if (spawnPanel != null)
+        {
+            spawnPanel.SetActive(false);
+        }
 
         Cursor.lockState =
             CursorLockMode.Locked;

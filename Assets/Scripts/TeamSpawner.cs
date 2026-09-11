@@ -4,73 +4,104 @@ using UnityEngine;
 
 public class TeamSpawner : MonoBehaviour
 {
+    [System.Serializable]
+    public class UnitSpawnType
+    {
+        public string unitName;
+        public GameObject unitPrefab;
+        public int maxAlive = 3;
+
+        [HideInInspector]
+        public List<GameObject> aliveUnits = new List<GameObject>();
+
+        [HideInInspector]
+        public bool isRespawning;
+    }
+
     [Header("Team")]
     public Team team;
 
-    [Header("Unit")]
-    public GameObject unitPrefab;
+    [Header("Unit Types")]
+    public UnitSpawnType[] unitTypes;
 
     [Header("Spawn Points")]
     public Transform[] spawnPoints;
 
-    [Header("Battle Settings")]
-    public int maxAliveUnits = 3;
+    [Header("Respawn")]
     public float respawnDelay = 3f;
-
-    private List<GameObject> aliveUnits = new List<GameObject>();
-
-    private bool isRespawning;
 
     private void Start()
     {
-        SpawnStartingUnits();
+        SpawnStartingArmy();
     }
 
     private void Update()
     {
-        CleanupDeadUnits();
-
-        if (aliveUnits.Count < maxAliveUnits && !isRespawning)
+        foreach (UnitSpawnType unitType in unitTypes)
         {
-            StartCoroutine(RespawnUnit());
+            CleanupDeadUnits(unitType);
+
+            if (unitType.aliveUnits.Count < unitType.maxAlive &&
+                !unitType.isRespawning)
+            {
+                StartCoroutine(
+                    RespawnUnit(unitType)
+                );
+            }
         }
     }
 
-    private void SpawnStartingUnits()
+    private void SpawnStartingArmy()
     {
-        for (int i = 0; i < maxAliveUnits; i++)
+        foreach (UnitSpawnType unitType in unitTypes)
         {
-            SpawnUnit();
+            for (int i = 0; i < unitType.maxAlive; i++)
+            {
+                SpawnUnit(unitType);
+            }
         }
     }
 
-    private IEnumerator RespawnUnit()
+    private IEnumerator RespawnUnit(
+        UnitSpawnType unitType
+    )
     {
-        isRespawning = true;
+        unitType.isRespawning = true;
 
-        yield return new WaitForSeconds(respawnDelay);
+        yield return new WaitForSeconds(
+            respawnDelay
+        );
 
-        SpawnUnit();
+        SpawnUnit(unitType);
 
-        isRespawning = false;
+        unitType.isRespawning = false;
     }
 
-    private void SpawnUnit()
+    private void SpawnUnit(
+        UnitSpawnType unitType
+    )
     {
-        if (unitPrefab == null)
+        if (unitType.unitPrefab == null)
             return;
 
-        if (spawnPoints.Length == 0)
+        if (spawnPoints == null ||
+            spawnPoints.Length == 0)
             return;
 
         Transform spawnPoint =
-            spawnPoints[Random.Range(0, spawnPoints.Length)];
+            spawnPoints[
+                Random.Range(
+                    0,
+                    spawnPoints.Length
+                )
+            ];
 
-        GameObject newUnit = Instantiate(
-            unitPrefab,
-            spawnPoint.position,
-            spawnPoint.rotation
-        );
+        GameObject newUnit =
+            Instantiate(
+                unitType.unitPrefab,
+                spawnPoint.position,
+                spawnPoint.rotation
+            );
 
         TeamMember teamMember =
             newUnit.GetComponent<TeamMember>();
@@ -80,12 +111,16 @@ public class TeamSpawner : MonoBehaviour
             teamMember.team = team;
         }
 
-        aliveUnits.Add(newUnit);
+        unitType.aliveUnits.Add(
+            newUnit
+        );
     }
 
-    private void CleanupDeadUnits()
+    private void CleanupDeadUnits(
+        UnitSpawnType unitType
+    )
     {
-        aliveUnits.RemoveAll(
+        unitType.aliveUnits.RemoveAll(
             unit => unit == null
         );
     }

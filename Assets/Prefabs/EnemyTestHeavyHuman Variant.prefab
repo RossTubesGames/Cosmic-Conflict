@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &4254872090005488937
+--- !u!1001 &2411368646093134850
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,15 +10,63 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 970225930708397891, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: m_Name
-      value: EnemyTestHuman Variant
+      value: EnemyTestHeavyHuman Variant
       objectReference: {fileID: 0}
     - target: {fileID: 1446525576763263159, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: c66cd46796eb8ab4ca42ee355b85355b, type: 2}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: fireRate
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: shootRange
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: bulletSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: rotationSpeed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4657756654445545119, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_Speed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4657756654445545119, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_Height
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4657756654445545119, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4657756654445545119, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_BaseOffset
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5735877558329506575, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: team
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6802244563468567419, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: maxHealth
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687764809360734397, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687764809360734397, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687764809360734397, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.4
       objectReference: {fileID: 0}
     - target: {fileID: 8687764809360734397, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -26,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687764809360734397, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.409
       objectReference: {fileID: 0}
     - target: {fileID: 8687764809360734397, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: m_LocalPosition.z

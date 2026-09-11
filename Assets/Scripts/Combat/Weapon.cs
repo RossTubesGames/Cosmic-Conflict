@@ -12,8 +12,10 @@ public class Weapon : MonoBehaviour
     public float bulletDamage = 25f;
     public float bulletLifetime = 10f;
 
-    private float nextFireTime;
+    [Header("Aiming")]
+    public float aimDistance = 200f;
 
+    private float nextFireTime;
     private TeamMember teamMember;
 
     private void Start()
@@ -36,10 +38,34 @@ public class Weapon : MonoBehaviour
 
     private void Shoot()
     {
+        if (shootPoint == null ||
+            bulletPrefab == null ||
+            Camera.main == null)
+        {
+            return;
+        }
+
+        // Aim far forward from the CENTER of the camera.
+        // We do NOT use a close wall hit point anymore.
+        Vector3 aimPoint =
+            Camera.main.transform.position +
+            Camera.main.transform.forward *
+            aimDistance;
+
+        // Bullet starts at the gun,
+        // but travels toward the camera's aim direction.
+        Vector3 shootDirection =
+            (aimPoint - shootPoint.position).normalized;
+
+        Quaternion bulletRotation =
+            Quaternion.LookRotation(
+                shootDirection
+            );
+
         GameObject bullet = Instantiate(
             bulletPrefab,
             shootPoint.position,
-            shootPoint.rotation
+            bulletRotation
         );
 
         Projectile projectile =
