@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    [Header("Player Prefab")]
+    [Header("Selected Character")]
     public GameObject playerPrefab;
 
     [Header("Player Team")]
@@ -13,16 +13,22 @@ public class PlayerSpawner : MonoBehaviour
 
     private GameObject currentPlayer;
 
-    private void Update()
+    public void SetPlayerPrefab(GameObject newPlayerPrefab)
     {
-        // TEMPORARY TEST
-        // Later the UI button will call this instead.
-        if (Input.GetKeyDown(KeyCode.P))
+        playerPrefab = newPlayerPrefab;
+
+        if (newPlayerPrefab != null)
         {
-            SpawnPlayerAtCommandPost(
-                testCommandPost
+            Debug.Log(
+                "Selected character: " +
+                newPlayerPrefab.name
             );
         }
+    }
+
+    public void SetTeam(Team newTeam)
+    {
+        playerTeam = newTeam;
     }
 
     public void SpawnPlayerAtCommandPost(
@@ -32,7 +38,7 @@ public class PlayerSpawner : MonoBehaviour
         if (playerPrefab == null)
         {
             Debug.LogWarning(
-                "PlayerSpawner: No Player Prefab assigned."
+                "PlayerSpawner: No character selected."
             );
 
             return;
@@ -56,8 +62,6 @@ public class PlayerSpawner : MonoBehaviour
             return;
         }
 
-        // Only allow spawning at command posts
-        // owned by the player's team.
         if (commandPost.ownerTeam != playerTeam)
         {
             Debug.LogWarning(
@@ -68,7 +72,6 @@ public class PlayerSpawner : MonoBehaviour
             return;
         }
 
-        // Prevent accidentally creating multiple Players.
         if (currentPlayer != null)
         {
             Destroy(currentPlayer);
@@ -89,28 +92,31 @@ public class PlayerSpawner : MonoBehaviour
                 playerTeam;
         }
 
-        // Immediately connect camera.
-        ThirdPersonCamera cameraController =
-            Camera.main.GetComponent<ThirdPersonCamera>();
-
-        if (cameraController != null)
+        if (Camera.main != null)
         {
-            Transform camTarget =
-                currentPlayer.transform.Find(
-                    "CamTarget"
-                );
+            ThirdPersonCamera cameraController =
+                Camera.main.GetComponent<ThirdPersonCamera>();
 
-            if (camTarget != null)
+            if (cameraController != null)
             {
-                cameraController.SetTarget(
-                    camTarget
-                );
+                Transform camTarget =
+                    currentPlayer.transform.Find(
+                        "CamTarget"
+                    );
+
+                if (camTarget != null)
+                {
+                    cameraController.SetTarget(
+                        camTarget
+                    );
+                }
             }
         }
 
         Debug.Log(
-            "Player spawned at "
-            + commandPost.name
+            playerPrefab.name +
+            " spawned at " +
+            commandPost.name
         );
     }
 }

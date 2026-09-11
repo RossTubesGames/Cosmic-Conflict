@@ -171,9 +171,13 @@ public class SpawnMenu : MonoBehaviour
             Destroy(deadPlayer);
         }
 
-        Debug.Log(
-            "CHANGE CHARACTER MENU COMES NEXT"
-        );
+        CharacterSelectMenu characterMenu =
+            FindFirstObjectByType<CharacterSelectMenu>();
+
+        if (characterMenu != null)
+        {
+            characterMenu.OpenCharacterMenu();
+        }
     }
 
     private void OpenSpawnMenu()
