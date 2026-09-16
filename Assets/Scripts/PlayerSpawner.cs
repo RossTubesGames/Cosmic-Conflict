@@ -8,14 +8,14 @@ public class PlayerSpawner : MonoBehaviour
     [Header("Player Team")]
     public Team playerTeam = Team.Human;
 
-    [Header("Test Command Post")]
-    public CommandPost testCommandPost;
-
     private GameObject currentPlayer;
 
-    public void SetPlayerPrefab(GameObject newPlayerPrefab)
+    public void SetPlayerPrefab(
+        GameObject newPlayerPrefab
+    )
     {
-        playerPrefab = newPlayerPrefab;
+        playerPrefab =
+            newPlayerPrefab;
 
         if (newPlayerPrefab != null)
         {
@@ -28,7 +28,8 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SetTeam(Team newTeam)
     {
-        playerTeam = newTeam;
+        playerTeam =
+            newTeam;
     }
 
     public void SpawnPlayerAtCommandPost(
@@ -62,11 +63,14 @@ public class PlayerSpawner : MonoBehaviour
             return;
         }
 
-        if (commandPost.ownerTeam != playerTeam)
+        // NEW ownership check
+        if (!commandPost.IsOwnedBy(playerTeam))
         {
             Debug.LogWarning(
-                "Cannot spawn here. Command Post belongs to "
-                + commandPost.ownerTeam
+                "Cannot spawn at " +
+                commandPost.name +
+                ". It is not owned by " +
+                playerTeam
             );
 
             return;
@@ -77,11 +81,12 @@ public class PlayerSpawner : MonoBehaviour
             Destroy(currentPlayer);
         }
 
-        currentPlayer = Instantiate(
-            playerPrefab,
-            commandPost.playerSpawnPoint.position,
-            commandPost.playerSpawnPoint.rotation
-        );
+        currentPlayer =
+            Instantiate(
+                playerPrefab,
+                commandPost.playerSpawnPoint.position,
+                commandPost.playerSpawnPoint.rotation
+            );
 
         TeamMember teamMember =
             currentPlayer.GetComponent<TeamMember>();
@@ -92,6 +97,7 @@ public class PlayerSpawner : MonoBehaviour
                 playerTeam;
         }
 
+        // Reconnect camera
         if (Camera.main != null)
         {
             ThirdPersonCamera cameraController =
@@ -110,13 +116,21 @@ public class PlayerSpawner : MonoBehaviour
                         camTarget
                     );
                 }
+                else
+                {
+                    Debug.LogWarning(
+                        "Spawned player has no CamTarget!"
+                    );
+                }
             }
         }
 
         Debug.Log(
             playerPrefab.name +
             " spawned at " +
-            commandPost.name
+            commandPost.name +
+            " as " +
+            playerTeam
         );
     }
 }

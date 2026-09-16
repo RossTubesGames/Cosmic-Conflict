@@ -10,12 +10,14 @@ public class SpawnMenu : MonoBehaviour
 
     [Header("Command Posts")]
     public CommandPost westPost;
+    public CommandPost centralPost;
     public CommandPost eastPost;
 
     [Header("Spawn UI")]
     public GameObject spawnPanel;
 
     public Button westPostButton;
+    public Button centralPostButton;
     public Button eastPostButton;
 
     [Header("Death UI")]
@@ -38,10 +40,14 @@ public class SpawnMenu : MonoBehaviour
         // No player exists at the beginning,
         // so show the spawn menu immediately.
         if (spawnPanel != null)
+        {
             spawnPanel.SetActive(true);
+        }
 
         if (deathPanel != null)
+        {
             deathPanel.SetActive(false);
+        }
 
         Cursor.lockState =
             CursorLockMode.None;
@@ -55,7 +61,11 @@ public class SpawnMenu : MonoBehaviour
     {
         selectedTeam = Team.Human;
 
-        playerSpawner.playerTeam = selectedTeam;
+        if (playerSpawner != null)
+        {
+            playerSpawner.playerTeam =
+                selectedTeam;
+        }
 
         UpdatePostButtons();
     }
@@ -64,28 +74,44 @@ public class SpawnMenu : MonoBehaviour
     {
         selectedTeam = Team.Alien;
 
-        playerSpawner.playerTeam = selectedTeam;
+        if (playerSpawner != null)
+        {
+            playerSpawner.playerTeam =
+                selectedTeam;
+        }
 
         UpdatePostButtons();
     }
 
     private void UpdatePostButtons()
     {
-        if (westPostButton != null)
+        if (westPostButton != null &&
+            westPost != null)
         {
             westPostButton.interactable =
-                westPost.ownerTeam == selectedTeam;
+                westPost.IsOwnedBy(selectedTeam);
         }
 
-        if (eastPostButton != null)
+        if (centralPostButton != null &&
+            centralPost != null)
+        {
+            centralPostButton.interactable =
+                centralPost.IsOwnedBy(selectedTeam);
+        }
+
+        if (eastPostButton != null &&
+            eastPost != null)
         {
             eastPostButton.interactable =
-                eastPost.ownerTeam == selectedTeam;
+                eastPost.IsOwnedBy(selectedTeam);
         }
     }
 
     public void SpawnAtWest()
     {
+        if (westPost == null)
+            return;
+
         playerSpawner.SpawnPlayerAtCommandPost(
             westPost
         );
@@ -93,8 +119,23 @@ public class SpawnMenu : MonoBehaviour
         HideSpawnMenu();
     }
 
+    public void SpawnAtCentral()
+    {
+        if (centralPost == null)
+            return;
+
+        playerSpawner.SpawnPlayerAtCommandPost(
+            centralPost
+        );
+
+        HideSpawnMenu();
+    }
+
     public void SpawnAtEast()
     {
+        if (eastPost == null)
+            return;
+
         playerSpawner.SpawnPlayerAtCommandPost(
             eastPost
         );
@@ -107,10 +148,14 @@ public class SpawnMenu : MonoBehaviour
         deadPlayer = player;
 
         if (spawnPanel != null)
+        {
             spawnPanel.SetActive(false);
+        }
 
         if (deathPanel != null)
+        {
             deathPanel.SetActive(true);
+        }
 
         Cursor.lockState =
             CursorLockMode.None;
@@ -123,7 +168,9 @@ public class SpawnMenu : MonoBehaviour
         }
 
         respawnCoroutine =
-            StartCoroutine(RespawnCountdown());
+            StartCoroutine(
+                RespawnCountdown()
+            );
     }
 
     private IEnumerator RespawnCountdown()
@@ -136,8 +183,10 @@ public class SpawnMenu : MonoBehaviour
             if (countdownText != null)
             {
                 countdownText.text =
-                    "Respawn in "
-                    + Mathf.CeilToInt(timeRemaining);
+                    "Respawn in " +
+                    Mathf.CeilToInt(
+                        timeRemaining
+                    );
             }
 
             timeRemaining -=
@@ -158,7 +207,11 @@ public class SpawnMenu : MonoBehaviour
     {
         if (respawnCoroutine != null)
         {
-            StopCoroutine(respawnCoroutine);
+            StopCoroutine(
+                respawnCoroutine
+            );
+
+            respawnCoroutine = null;
         }
 
         if (deathPanel != null)
@@ -169,6 +222,8 @@ public class SpawnMenu : MonoBehaviour
         if (deadPlayer != null)
         {
             Destroy(deadPlayer);
+
+            deadPlayer = null;
         }
 
         CharacterSelectMenu characterMenu =
@@ -184,7 +239,11 @@ public class SpawnMenu : MonoBehaviour
     {
         if (respawnCoroutine != null)
         {
-            StopCoroutine(respawnCoroutine);
+            StopCoroutine(
+                respawnCoroutine
+            );
+
+            respawnCoroutine = null;
         }
 
         if (deathPanel != null)
@@ -195,6 +254,8 @@ public class SpawnMenu : MonoBehaviour
         if (deadPlayer != null)
         {
             Destroy(deadPlayer);
+
+            deadPlayer = null;
         }
 
         if (spawnPanel != null)

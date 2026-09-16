@@ -18,22 +18,32 @@ public class EnemyAI : MonoBehaviour
     public float bulletDamage = 20f;
     public float bulletLifetime = 10f;
 
-    [Header("Targeting")]
+    [Header("Combat Targeting")]
+    public float enemyDetectionRange = 15f;
     public float targetSearchInterval = 0.5f;
 
+    [Header("Objectives")]
+    public float objectiveStopDistance = 2f;
+
     private TeamMember myTeam;
-    private Transform currentTarget;
+
+    private Transform currentEnemy;
+    private CommandPost currentObjective;
+
     private float nextFireTime;
     private float nextTargetSearchTime;
 
     private void Start()
     {
         if (agent == null)
+        {
             agent = GetComponent<NavMeshAgent>();
+        }
 
         myTeam = GetComponent<TeamMember>();
 
-        FindTarget();
+        FindEnemy();
+        FindObjective();
     }
 
     private void Update()
@@ -41,23 +51,146 @@ public class EnemyAI : MonoBehaviour
         if (myTeam == null)
             return;
 
+        // Periodically update combat target
+        // and command-post objective.
         if (Time.time >= nextTargetSearchTime)
         {
-            FindTarget();
-            nextTargetSearchTime = Time.time + targetSearchInterval;
+            FindEnemy();
+
+            if (currentObjective == null ||
+                currentObjective.IsOwnedBy(myTeam.team))
+            {
+                FindObjective();
+            }
+
+            nextTargetSearchTime =
+                Time.time + targetSearchInterval;
         }
 
-        if (currentTarget == null)
+        // Priority 1:
+        // Fight nearby enemies.
+        if (currentEnemy != null)
+        {
+            HandleEnemy();
+            return;
+        }
+
+        // Priority 2:
+        // Capture command posts.
+        if (currentObjective != null)
+        {
+            HandleObjective();
+            return;
+        }
+
+        // Nothing to do.
+        if (agent != null)
+        {
+            agent.isStopped = true;
+        }
+    }
+
+    private void FindEnemy()
+    {
+        TeamMember[] allTeamMembers =
+            FindObjectsByType<TeamMember>(
+                FindObjectsSortMode.None
+            );
+
+        float closestDistance =
+            enemyDetectionRange;
+
+        Transform closestTarget =
+            null;
+
+        foreach (TeamMember member in allTeamMembers)
+        {
+            if (member == null)
+                continue;
+
+            if (member == myTeam)
+                continue;
+
+            if (member.team == myTeam.team)
+                continue;
+
+            float distance =
+                Vector3.Distance(
+                    transform.position,
+                    member.transform.position
+                );
+
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestTarget =
+                    member.transform;
+            }
+        }
+
+        currentEnemy =
+            closestTarget;
+    }
+
+    private void FindObjective()
+    {
+        CommandPost[] commandPosts =
+            FindObjectsByType<CommandPost>(
+                FindObjectsSortMode.None
+            );
+
+        float closestDistance =
+            Mathf.Infinity;
+
+        CommandPost closestPost =
+            null;
+
+        foreach (CommandPost post in commandPosts)
+        {
+            if (post == null)
+                continue;
+
+            // Ignore posts already owned
+            // by our faction.
+            if (post.IsOwnedBy(myTeam.team))
+                continue;
+
+            float distance =
+                Vector3.Distance(
+                    transform.position,
+                    post.transform.position
+                );
+
+            if (distance < closestDistance)
+            {
+                closestDistance =
+                    distance;
+
+                closestPost =
+                    post;
+            }
+        }
+
+        currentObjective =
+            closestPost;
+    }
+
+    private void HandleEnemy()
+    {
+        if (currentEnemy == null)
             return;
 
-        float distance = Vector3.Distance(
-            transform.position,
-            currentTarget.position
-        );
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                currentEnemy.position
+            );
 
         if (distance > shootRange)
         {
-            MoveToTarget();
+            MoveTo(
+                currentEnemy.position
+            );
         }
         else
         {
@@ -65,40 +198,46 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void FindTarget()
+    private void HandleObjective()
     {
-        TeamMember[] allTeamMembers =
-            FindObjectsByType<TeamMember>(
-                FindObjectsSortMode.None
-            );
+        if (currentObjective == null)
+            return;
 
-        float closestDistance = Mathf.Infinity;
-        Transform closestTarget = null;
-
-        foreach (TeamMember member in allTeamMembers)
+        // Objective was captured by our team.
+        // Find another one.
+        if (currentObjective.IsOwnedBy(myTeam.team))
         {
-            if (member == myTeam)
-                continue;
+            currentObjective = null;
 
-            if (member.team == myTeam.team)
-                continue;
+            FindObjective();
 
-            float distance = Vector3.Distance(
-                transform.position,
-                member.transform.position
-            );
-
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestTarget = member.transform;
-            }
+            return;
         }
 
-        currentTarget = closestTarget;
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                currentObjective.transform.position
+            );
+
+        // Move into the command post.
+        if (distance > objectiveStopDistance)
+        {
+            MoveTo(
+                currentObjective.transform.position
+            );
+        }
+        else
+        {
+            // Stay inside the capture area.
+            if (agent != null)
+            {
+                agent.isStopped = true;
+            }
+        }
     }
 
-    private void MoveToTarget()
+    private void MoveTo(Vector3 position)
     {
         if (agent == null)
             return;
@@ -106,17 +245,22 @@ public class EnemyAI : MonoBehaviour
         agent.isStopped = false;
 
         agent.SetDestination(
-            currentTarget.position
+            position
         );
     }
 
     private void StopAndShoot()
     {
+        if (currentEnemy == null)
+            return;
+
         if (agent != null)
+        {
             agent.isStopped = true;
+        }
 
         Vector3 direction =
-            currentTarget.position -
+            currentEnemy.position -
             transform.position;
 
         direction.y = 0f;
@@ -124,13 +268,16 @@ public class EnemyAI : MonoBehaviour
         if (direction.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation =
-                Quaternion.LookRotation(direction);
+                Quaternion.LookRotation(
+                    direction
+                );
 
             transform.rotation =
                 Quaternion.Slerp(
                     transform.rotation,
                     targetRotation,
-                    rotationSpeed * Time.deltaTime
+                    rotationSpeed *
+                    Time.deltaTime
                 );
         }
 
@@ -145,22 +292,38 @@ public class EnemyAI : MonoBehaviour
 
     private void Shoot()
     {
-        GameObject bullet = Instantiate(
-            bulletPrefab,
-            shootPoint.position,
-            shootPoint.rotation
-        );
+        if (shootPoint == null ||
+            bulletPrefab == null)
+        {
+            return;
+        }
+
+        GameObject bullet =
+            Instantiate(
+                bulletPrefab,
+                shootPoint.position,
+                shootPoint.rotation
+            );
 
         Projectile projectile =
             bullet.GetComponent<Projectile>();
 
         if (projectile != null)
         {
-            projectile.team = myTeam.team;
-            projectile.owner = transform.root;
-            projectile.speed = bulletSpeed;
-            projectile.damage = bulletDamage;
-            projectile.lifetime = bulletLifetime;
+            projectile.team =
+                myTeam.team;
+
+            projectile.owner =
+                transform.root;
+
+            projectile.speed =
+                bulletSpeed;
+
+            projectile.damage =
+                bulletDamage;
+
+            projectile.lifetime =
+                bulletLifetime;
         }
     }
 }
