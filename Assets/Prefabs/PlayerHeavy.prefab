@@ -379,6 +379,7 @@ GameObject:
   - component: {fileID: 7549392345146721949}
   - component: {fileID: 2192072841040142989}
   - component: {fileID: 5607738825108026633}
+  - component: {fileID: 2104088144821405456}
   m_Layer: 0
   m_Name: PlayerHeavy
   m_TagString: Player
@@ -487,6 +488,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 0
+--- !u!114 &2104088144821405456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7692469273625173288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25076cb941d697b4e8989540d7ecd97f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSquadSize: 2
+  recruitRange: 15
+  followDistance: 2.5
+  sideDistance: 1.5
+  followKey: 102
+  holdKey: 103
 --- !u!1 &7856538933877865248
 GameObject:
   m_ObjectHideFlags: 0

@@ -283,6 +283,11 @@ MonoBehaviour:
     maxAlive: 2
     aliveUnits: []
     isRespawning: 0
+  - unitName: Medic
+    unitPrefab: {fileID: 8233813052139214379, guid: 9f05b92ace8e0c543a077213beef68b4, type: 3}
+    maxAlive: 1
+    aliveUnits: []
+    isRespawning: 0
   spawnPoints:
   - {fileID: 2145355772}
   - {fileID: 85504488}
@@ -4425,7 +4430,7 @@ MonoBehaviour:
   eastPost: {fileID: 37718386}
   spawnPanel: {fileID: 764350691}
   westPostButton: {fileID: 269592706}
-  centralPostButton: {fileID: 0}
+  centralPostButton: {fileID: 838637998}
   eastPostButton: {fileID: 1260296364}
   deathPanel: {fileID: 1179566106}
   countdownText: {fileID: 683272308}
