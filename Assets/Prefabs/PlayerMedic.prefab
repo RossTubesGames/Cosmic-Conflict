@@ -242,6 +242,7 @@ GameObject:
   - component: {fileID: 7293697514988829667}
   - component: {fileID: 8196657333701386971}
   - component: {fileID: 8901385196766121154}
+  - component: {fileID: -6397606850197929149}
   m_Layer: 0
   m_Name: PlayerMedic
   m_TagString: Player
@@ -408,6 +409,23 @@ MonoBehaviour:
   healAmount: 20
   healInterval: 1
   healLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &-6397606850197929149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6312593470187896633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6d1b4db771ec4441be2ba0cbe628d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  friendlyHealthText: {fileID: 0}
+  lookRange: 20
+  lookLayers:
     serializedVersion: 2
     m_Bits: 4294967295
 --- !u!1 &7433930661614666157

@@ -384,6 +384,7 @@ GameObject:
   - component: {fileID: 5607738825108026633}
   - component: {fileID: 2104088144821405456}
   - component: {fileID: -2687110931651920208}
+  - component: {fileID: 2317580591443398719}
   m_Layer: 0
   m_Name: PlayerHeavy
   m_TagString: Player
@@ -479,6 +480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 150
+  healthText: {fileID: 0}
 --- !u!114 &5607738825108026633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,6 +534,23 @@ MonoBehaviour:
   throwForce: 12
   upwardForce: 4
   throwDelay: 1.2
+--- !u!114 &2317580591443398719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7692469273625173288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6d1b4db771ec4441be2ba0cbe628d52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  friendlyHealthText: {fileID: 0}
+  lookRange: 20
+  lookLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &7856538933877865248
 GameObject:
   m_ObjectHideFlags: 0
