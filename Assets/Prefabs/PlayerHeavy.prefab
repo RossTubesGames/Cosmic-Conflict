@@ -84,6 +84,9 @@ MonoBehaviour:
   bulletDamage: 25
   bulletLifetime: 20
   aimDistance: 200
+  aimLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &3994851946259840527
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,6 +383,7 @@ GameObject:
   - component: {fileID: 2192072841040142989}
   - component: {fileID: 5607738825108026633}
   - component: {fileID: 2104088144821405456}
+  - component: {fileID: -2687110931651920208}
   m_Layer: 0
   m_Name: PlayerHeavy
   m_TagString: Player
@@ -500,12 +504,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25076cb941d697b4e8989540d7ecd97f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSquadSize: 2
-  recruitRange: 15
+  maxFollowers: 2
+  followCommandRange: 15
+  maxAreaCommandUnits: 4
+  areaCommandRange: 15
   followDistance: 2.5
   sideDistance: 1.5
   followKey: 102
   holdKey: 103
+  freeKey: 104
+--- !u!114 &-2687110931651920208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7692469273625173288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40dc91ca023397a43ae9a79c1f5e11a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grenadePrefab: {fileID: 2436454916965918627, guid: 52c5c39b6f9159c4da1e67af880c9f9a, type: 3}
+  throwPoint: {fileID: 2402596530266766492}
+  maxGrenades: 4
+  grenadeKey: 113
+  throwForce: 12
+  upwardForce: 4
+  throwDelay: 1.2
 --- !u!1 &7856538933877865248
 GameObject:
   m_ObjectHideFlags: 0
