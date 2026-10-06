@@ -15,6 +15,10 @@ public class Weapon : MonoBehaviour
     [Header("Aiming")]
     public float aimDistance = 200f;
 
+    // Choose what the crosshair is allowed
+    // to detect in the Inspector.
+    public LayerMask aimLayers = ~0;
+
     private float nextFireTime;
     private TeamMember teamMember;
 
@@ -45,28 +49,69 @@ public class Weapon : MonoBehaviour
             return;
         }
 
-        // Aim far forward from the CENTER of the camera.
-        // We do NOT use a close wall hit point anymore.
-        Vector3 aimPoint =
-            Camera.main.transform.position +
-            Camera.main.transform.forward *
-            aimDistance;
+        // =====================================
+        // 1. RAY FROM CENTER OF CAMERA
+        // =====================================
 
-        // Bullet starts at the gun,
-        // but travels toward the camera's aim direction.
+        Ray aimRay = new Ray(
+            Camera.main.transform.position,
+            Camera.main.transform.forward
+        );
+
+        Vector3 aimPoint;
+
+        RaycastHit hit;
+
+        // =====================================
+        // 2. CHECK WHAT CROSSHAIR HITS
+        // =====================================
+
+        if (Physics.Raycast(
+            aimRay,
+            out hit,
+            aimDistance,
+            aimLayers,
+            QueryTriggerInteraction.Ignore
+        ))
+        {
+            // Crosshair hit something.
+            // Shoot toward that exact point.
+            aimPoint =
+                hit.point;
+        }
+        else
+        {
+            // Crosshair hit nothing.
+            // Aim far into the distance.
+            aimPoint =
+                Camera.main.transform.position +
+                Camera.main.transform.forward *
+                aimDistance;
+        }
+
+        // =====================================
+        // 3. GUN -> CROSSHAIR TARGET
+        // =====================================
+
         Vector3 shootDirection =
-            (aimPoint - shootPoint.position).normalized;
+            (aimPoint - shootPoint.position)
+            .normalized;
 
         Quaternion bulletRotation =
             Quaternion.LookRotation(
                 shootDirection
             );
 
-        GameObject bullet = Instantiate(
-            bulletPrefab,
-            shootPoint.position,
-            bulletRotation
-        );
+        // =====================================
+        // 4. CREATE BULLET
+        // =====================================
+
+        GameObject bullet =
+            Instantiate(
+                bulletPrefab,
+                shootPoint.position,
+                bulletRotation
+            );
 
         Projectile projectile =
             bullet.GetComponent<Projectile>();
