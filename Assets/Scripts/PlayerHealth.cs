@@ -13,9 +13,22 @@ public class PlayerHealth : MonoBehaviour
     private float currentHealth;
     private bool isDead = false;
 
+    public float CurrentHealth
+    {
+        get { return currentHealth; }
+    }
+
+    public bool IsInjured
+    {
+        get
+        {
+            return currentHealth < maxHealth &&
+                   !isDead;
+        }
+    }
+
     private void Start()
     {
-
         currentHealth = maxHealth;
 
         PlayerHealthUI healthUI =
@@ -54,6 +67,30 @@ public class PlayerHealth : MonoBehaviour
         {
             Die();
         }
+    }
+
+    public void Heal(float amount)
+    {
+        if (isDead)
+            return;
+
+        if (currentHealth <= 0f)
+            return;
+
+        currentHealth += amount;
+
+        currentHealth = Mathf.Clamp(
+            currentHealth,
+            0f,
+            maxHealth
+        );
+
+        Debug.Log(
+            "Player healed. HP: " +
+            currentHealth
+        );
+
+        UpdateHealthUI();
     }
 
     private void UpdateHealthUI()

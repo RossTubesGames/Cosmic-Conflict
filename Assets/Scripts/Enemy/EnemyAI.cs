@@ -79,7 +79,9 @@ public class EnemyAI : MonoBehaviour
     private Transform currentEnemy;
     private CommandPost currentObjective;
 
-    private EnemyHealth injuredAlly;
+    private EnemyHealth injuredAI;
+    private PlayerHealth injuredPlayer;
+    private Transform injuredTarget;
 
     private Vector3 formationPosition;
     private Vector3 holdPosition;
@@ -182,7 +184,7 @@ public class EnemyAI : MonoBehaviour
 
         if (aiClass == AIClass.Medic)
         {
-            if (injuredAlly != null)
+            if (injuredTarget != null)
             {
                 HandleMedic();
                 return;
@@ -488,7 +490,13 @@ public class EnemyAI : MonoBehaviour
         float closestDistance =
             medicSearchRange;
 
-        EnemyHealth closestInjuredAlly =
+        EnemyHealth closestAI =
+            null;
+
+        PlayerHealth closestPlayer =
+            null;
+
+        Transform closestTarget =
             null;
 
         foreach (TeamMember member in allTeamMembers)
@@ -499,16 +507,31 @@ public class EnemyAI : MonoBehaviour
             if (member == myTeam)
                 continue;
 
+            // Medic only heals its own team.
             if (member.team != myTeam.team)
                 continue;
 
-            EnemyHealth health =
+            EnemyHealth enemyHealth =
                 member.GetComponent<EnemyHealth>();
 
-            if (health == null)
-                continue;
+            PlayerHealth playerHealth =
+                member.GetComponent<PlayerHealth>();
 
-            if (!health.IsInjured)
+            bool needsHealing = false;
+
+            if (enemyHealth != null &&
+                enemyHealth.IsInjured)
+            {
+                needsHealing = true;
+            }
+
+            if (playerHealth != null &&
+                playerHealth.IsInjured)
+            {
+                needsHealing = true;
+            }
+
+            if (!needsHealing)
                 continue;
 
             float distance =
@@ -522,36 +545,65 @@ public class EnemyAI : MonoBehaviour
                 closestDistance =
                     distance;
 
-                closestInjuredAlly =
-                    health;
+                closestTarget =
+                    member.transform;
+
+                closestAI =
+                    enemyHealth;
+
+                closestPlayer =
+                    playerHealth;
             }
         }
 
-        injuredAlly =
-            closestInjuredAlly;
+        injuredTarget =
+            closestTarget;
+
+        injuredAI =
+            closestAI;
+
+        injuredPlayer =
+            closestPlayer;
     }
 
     private void HandleMedic()
     {
-        if (injuredAlly == null)
+        if (injuredTarget == null)
             return;
 
-        if (!injuredAlly.IsInjured)
+        bool stillInjured = false;
+
+        if (injuredAI != null &&
+            injuredAI.IsInjured)
         {
-            injuredAlly = null;
+            stillInjured = true;
+        }
+
+        if (injuredPlayer != null &&
+            injuredPlayer.IsInjured)
+        {
+            stillInjured = true;
+        }
+
+        if (!stillInjured)
+        {
+            injuredAI = null;
+            injuredPlayer = null;
+            injuredTarget = null;
+
             return;
         }
 
         float distance =
             Vector3.Distance(
                 transform.position,
-                injuredAlly.transform.position
+                injuredTarget.position
             );
 
         if (distance > healRange)
         {
             MoveTo(
-                injuredAlly.transform.position
+                injuredTarget.position
             );
 
             return;
@@ -560,21 +612,30 @@ public class EnemyAI : MonoBehaviour
         StopMoving();
 
         FaceTarget(
-            injuredAlly.transform.position
+            injuredTarget.position
         );
 
         if (Time.time >= nextHealTime)
         {
-            injuredAlly.Heal(
-                healAmount
-            );
+            if (injuredAI != null)
+            {
+                injuredAI.Heal(
+                    healAmount
+                );
+            }
+
+            if (injuredPlayer != null)
+            {
+                injuredPlayer.Heal(
+                    healAmount
+                );
+            }
 
             nextHealTime =
                 Time.time +
                 healInterval;
         }
     }
-
     // =========================================
     // TARGETING
     // =========================================

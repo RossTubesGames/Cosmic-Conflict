@@ -8,6 +8,7 @@ public class CharacterSelectMenu : MonoBehaviour
     [Header("Player Prefabs")]
     public GameObject assaultPrefab;
     public GameObject heavyPrefab;
+    public GameObject medicPrefab;
 
     [Header("UI Panels")]
     public GameObject characterPanel;
@@ -26,6 +27,15 @@ public class CharacterSelectMenu : MonoBehaviour
     {
         playerSpawner.SetPlayerPrefab(
             heavyPrefab
+        );
+
+        OpenSpawnMenu();
+    }
+
+    public void SelectMedic()
+    {
+        playerSpawner.SetPlayerPrefab(
+            medicPrefab
         );
 
         OpenSpawnMenu();
