@@ -29,9 +29,17 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: grenadePrefab
+      value: 
+      objectReference: {fileID: 2436454916965918627, guid: 52c5c39b6f9159c4da1e67af880c9f9a, type: 3}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: rotationSpeed
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: grenadeThrowPoint
+      value: 
+      objectReference: {fileID: 7298652671355322028}
     - target: {fileID: 4657756654445545119, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: m_Speed
       value: 3
@@ -113,3 +121,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+--- !u!4 &7298652671355322028 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4917054408030921390, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+  m_PrefabInstance: {fileID: 2411368646093134850}
+  m_PrefabAsset: {fileID: 0}

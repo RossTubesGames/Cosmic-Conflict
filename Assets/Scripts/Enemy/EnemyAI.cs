@@ -35,6 +35,26 @@ public class EnemyAI : MonoBehaviour
     public float bulletDamage = 20f;
     public float bulletLifetime = 10f;
 
+    [Header("Grenades")]
+    public GameObject grenadePrefab;
+    public Transform grenadeThrowPoint;
+
+    public int maxGrenades = 4;
+
+    public float grenadeMinRange = 5f;
+    public float grenadeMaxRange = 15f;
+
+    public float grenadeThrowForce = 10f;
+    public float grenadeUpwardForce = 4f;
+
+    public float grenadeThrowDelay = 2f;
+
+    [Header("Grenade AI")]
+    public float grenadeDecisionInterval = 3f;
+
+    [Range(0f, 1f)]
+    public float grenadeThrowChance = 0.25f;
+
     [Header("Combat Targeting")]
     public float enemyDetectionRange = 15f;
     public float targetSearchInterval = 0.5f;
@@ -64,18 +84,28 @@ public class EnemyAI : MonoBehaviour
     private Vector3 formationPosition;
     private Vector3 holdPosition;
 
+    private int currentGrenades;
+
     private float nextFireTime;
     private float nextHealTime;
     private float nextTargetSearchTime;
+
+    private float nextGrenadeTime;
+    private float nextGrenadeDecisionTime;
 
     private void Start()
     {
         if (agent == null)
         {
-            agent = GetComponent<NavMeshAgent>();
+            agent =
+                GetComponent<NavMeshAgent>();
         }
 
-        myTeam = GetComponent<TeamMember>();
+        myTeam =
+            GetComponent<TeamMember>();
+
+        currentGrenades =
+            maxGrenades;
 
         FindEnemy();
         FindObjective();
@@ -84,6 +114,15 @@ public class EnemyAI : MonoBehaviour
         {
             FindInjuredAlly();
         }
+
+        // Give each AI a slightly different
+        // first grenade decision time.
+        nextGrenadeDecisionTime =
+            Time.time +
+            Random.Range(
+                0.5f,
+                grenadeDecisionInterval
+            );
     }
 
     private void Update()
@@ -109,6 +148,16 @@ public class EnemyAI : MonoBehaviour
             nextTargetSearchTime =
                 Time.time +
                 targetSearchInterval;
+        }
+
+        // =====================================
+        // GRENADE DECISION
+        // =====================================
+
+        if (aiClass != AIClass.Medic &&
+            currentEnemy != null)
+        {
+            TryThrowGrenade();
         }
 
         // =====================================
@@ -176,6 +225,143 @@ public class EnemyAI : MonoBehaviour
     }
 
     // =========================================
+    // GRENADES
+    // =========================================
+
+    private void TryThrowGrenade()
+    {
+        if (grenadePrefab == null ||
+            grenadeThrowPoint == null)
+        {
+            return;
+        }
+
+        if (currentEnemy == null)
+            return;
+
+        if (currentGrenades <= 0)
+            return;
+
+        if (Time.time < nextGrenadeTime)
+            return;
+
+        if (Time.time <
+            nextGrenadeDecisionTime)
+        {
+            return;
+        }
+
+        // Only make a grenade decision
+        // once every few seconds.
+        nextGrenadeDecisionTime =
+            Time.time +
+            grenadeDecisionInterval;
+
+        float distance =
+            Vector3.Distance(
+                transform.position,
+                currentEnemy.position
+            );
+
+        // Don't throw if the enemy
+        // is dangerously close.
+        if (distance < grenadeMinRange)
+            return;
+
+        // Don't throw if the enemy
+        // is too far away.
+        if (distance > grenadeMaxRange)
+            return;
+
+        // Random chance prevents every AI
+        // from throwing grenades together.
+        if (Random.value >
+            grenadeThrowChance)
+        {
+            return;
+        }
+
+        ThrowGrenade();
+    }
+
+    private void ThrowGrenade()
+    {
+        if (currentEnemy == null)
+            return;
+
+        if (grenadePrefab == null ||
+            grenadeThrowPoint == null)
+        {
+            return;
+        }
+
+        // Face the enemy before throwing.
+        FaceTarget(
+            currentEnemy.position
+        );
+
+        GameObject grenadeObject =
+            Instantiate(
+                grenadePrefab,
+                grenadeThrowPoint.position,
+                Quaternion.identity
+            );
+
+        Grenade grenade =
+            grenadeObject.GetComponent<Grenade>();
+
+        if (grenade != null)
+        {
+            grenade.team =
+                myTeam.team;
+
+            grenade.owner =
+                transform.root;
+        }
+
+        Rigidbody rb =
+            grenadeObject.GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            Vector3 direction =
+                currentEnemy.position -
+                grenadeThrowPoint.position;
+
+            // We control the vertical throw
+            // separately.
+            direction.y = 0f;
+
+            direction.Normalize();
+
+            Vector3 throwVelocity =
+                direction *
+                grenadeThrowForce;
+
+            throwVelocity +=
+                Vector3.up *
+                grenadeUpwardForce;
+
+            rb.AddForce(
+                throwVelocity,
+                ForceMode.Impulse
+            );
+        }
+
+        currentGrenades--;
+
+        nextGrenadeTime =
+            Time.time +
+            grenadeThrowDelay;
+
+        Debug.Log(
+            gameObject.name +
+            " threw grenade. Grenades left: " +
+            currentGrenades
+        );
+    }
+
+    // =========================================
     // SQUAD COMMANDS
     // =========================================
 
@@ -216,9 +402,6 @@ public class EnemyAI : MonoBehaviour
                 formationPosition
             );
 
-        // Fight enemies that are close,
-        // but don't permanently abandon
-        // the player.
         if (currentEnemy != null)
         {
             float enemyDistance =
@@ -254,8 +437,6 @@ public class EnemyAI : MonoBehaviour
                 holdPosition
             );
 
-        // Return to assigned hold position
-        // if we somehow moved away.
         if (distance > squadStopDistance)
         {
             MoveTo(
@@ -265,11 +446,8 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        // We reached the hold point.
         StopMoving();
 
-        // Shoot enemies from here,
-        // but DO NOT chase them.
         if (currentEnemy != null)
         {
             float enemyDistance =

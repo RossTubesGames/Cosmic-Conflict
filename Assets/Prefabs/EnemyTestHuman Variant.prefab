@@ -16,6 +16,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: c66cd46796eb8ab4ca42ee355b85355b, type: 2}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: grenadeThrowPoint
+      value: 
+      objectReference: {fileID: 9165024742165702535}
     - target: {fileID: 5735877558329506575, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: team
       value: 0
@@ -65,3 +69,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+--- !u!4 &9165024742165702535 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4917054408030921390, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+  m_PrefabInstance: {fileID: 4254872090005488937}
+  m_PrefabAsset: {fileID: 0}

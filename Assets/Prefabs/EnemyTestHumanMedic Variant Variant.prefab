@@ -244,6 +244,18 @@ PrefabInstance:
       propertyPath: fireRate
       value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 1486281183489468862, guid: 29c475e384533244fb65122ff8c76d0e, type: 3}
+      propertyPath: maxGrenades
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1486281183489468862, guid: 29c475e384533244fb65122ff8c76d0e, type: 3}
+      propertyPath: grenadePrefab
+      value: 
+      objectReference: {fileID: 2436454916965918627, guid: 52c5c39b6f9159c4da1e67af880c9f9a, type: 3}
+    - target: {fileID: 1486281183489468862, guid: 29c475e384533244fb65122ff8c76d0e, type: 3}
+      propertyPath: grenadeMinRange
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3925653196726299242, guid: 29c475e384533244fb65122ff8c76d0e, type: 3}
       propertyPath: m_Name
       value: EnemyTestHumanMedic Variant Variant

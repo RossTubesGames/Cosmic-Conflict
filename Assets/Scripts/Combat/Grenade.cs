@@ -11,9 +11,16 @@ public class Grenade : MonoBehaviour
     public float mediumRange = 3f;
     public float farRange = 7f;
 
+    [Header("Close Damage")]
     public float closeDamage = 300f;
-    public float mediumDamage = 150f;
-    public float farDamage = 50f;
+
+    [Header("Medium Damage")]
+    public float mediumDamageMin = 125f;
+    public float mediumDamageMax = 175f;
+
+    [Header("Far Damage")]
+    public float farDamageMin = 45f;
+    public float farDamageMax = 65f;
 
     [HideInInspector]
     public Team team;
@@ -94,7 +101,7 @@ public class Grenade : MonoBehaviour
                                 "Grenade hit player at " +
                                 distance.ToString("F1") +
                                 " meters for " +
-                                damage +
+                                damage.ToString("F0") +
                                 " damage."
                             );
 
@@ -144,7 +151,7 @@ public class Grenade : MonoBehaviour
                                 "Grenade hit AI at " +
                                 distance.ToString("F1") +
                                 " meters for " +
-                                damage +
+                                damage.ToString("F0") +
                                 " damage."
                             );
 
@@ -191,19 +198,29 @@ public class Grenade : MonoBehaviour
         float distance
     )
     {
+        // Direct / very close hit.
+        // Always lethal damage.
         if (distance <= closeRange)
         {
             return closeDamage;
         }
 
+        // Medium explosion range.
         if (distance <= mediumRange)
         {
-            return mediumDamage;
+            return Random.Range(
+                mediumDamageMin,
+                mediumDamageMax
+            );
         }
 
+        // Outer explosion range.
         if (distance <= farRange)
         {
-            return farDamage;
+            return Random.Range(
+                farDamageMin,
+                farDamageMax
+            );
         }
 
         return 0f;

@@ -32,6 +32,10 @@ PrefabInstance:
       propertyPath: rotationSpeed
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3435124206298000535, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+      propertyPath: grenadeThrowPoint
+      value: 
+      objectReference: {fileID: 6707617244324358706}
     - target: {fileID: 4657756654445545119, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
       propertyPath: m_Speed
       value: 3
@@ -113,3 +117,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+--- !u!4 &6707617244324358706 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4917054408030921390, guid: 11a1fceb09e0e144e887e73a0c24092f, type: 3}
+  m_PrefabInstance: {fileID: 1813504477749004444}
+  m_PrefabAsset: {fileID: 0}

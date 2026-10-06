@@ -95,6 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38e3b22fd2b4b4b40952834183c32126, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiClass: 0
   agent: {fileID: 4657756654445545119}
   shootPoint: {fileID: 4917054408030921390}
   bulletPrefab: {fileID: 5802753053293518684, guid: 347fec58a37cde84bafe96c03f9c120b, type: 3}
@@ -104,7 +105,25 @@ MonoBehaviour:
   bulletSpeed: 20
   bulletDamage: 20
   bulletLifetime: 10
+  grenadePrefab: {fileID: 2436454916965918627, guid: 52c5c39b6f9159c4da1e67af880c9f9a, type: 3}
+  grenadeThrowPoint: {fileID: 4917054408030921390}
+  maxGrenades: 4
+  grenadeMinRange: 5
+  grenadeMaxRange: 15
+  grenadeThrowForce: 10
+  grenadeUpwardForce: 4
+  grenadeThrowDelay: 2
+  grenadeDecisionInterval: 3
+  grenadeThrowChance: 0.25
+  enemyDetectionRange: 15
   targetSearchInterval: 0.5
+  objectiveStopDistance: 2
+  medicSearchRange: 20
+  healRange: 2.5
+  healAmount: 20
+  healInterval: 1
+  squadOrder: 0
+  squadStopDistance: 1
 --- !u!114 &6802244563468567419
 MonoBehaviour:
   m_ObjectHideFlags: 0
